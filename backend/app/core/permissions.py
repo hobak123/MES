@@ -1,0 +1,107 @@
+"""권한 카탈로그 및 역할별 기본 권한 (시드 데이터 원천)."""
+from __future__ import annotations
+
+PERMISSIONS: dict[str, tuple[str, str]] = {
+    # code: (module, name)
+    "system:manage": ("system", "조직·공장·환경 설정"),
+    "user:manage": ("system", "사용자·권한 관리"),
+    "audit:read": ("system", "감사로그 조회"),
+    "approval:decide": ("system", "승인 요청 처리"),
+    "master:read": ("master", "기준정보 조회"),
+    "master:write": ("master", "기준정보 등록/수정"),
+    "customer:write": ("master", "거래처 등록/수정"),
+    "receipt:read": ("receipt", "입고 조회"),
+    "receipt:write": ("receipt", "입고 등록/수정"),
+    "receipt:inspect": ("receipt", "입고 검수"),
+    "receipt:approve": ("receipt", "입고 품질 승인"),
+    "receipt:post": ("receipt", "입고 확정"),
+    "receipt:reverse": ("receipt", "입고 정정(역거래)"),
+    "ocr:use": ("receipt", "OCR 업로드/검토"),
+    "qr:read": ("qr", "QR 조회/스캔"),
+    "qr:print": ("qr", "라벨 출력"),
+    "qr:reprint": ("qr", "라벨 재출력"),
+    "inventory:read": ("inventory", "재고 조회"),
+    "inventory:move": ("inventory", "재고 이동/반납"),
+    "inventory:count": ("inventory", "재고 실사"),
+    "inventory:adjust_request": ("inventory", "재고 조정 요청"),
+    "inventory:adjust_approve": ("inventory", "재고 조정 승인"),
+    "inventory:dispose": ("inventory", "폐기/반품 요청"),
+    "inventory:reserve": ("inventory", "재고 예약"),
+    "quality:hold": ("quality", "품질 보류/해제"),
+    "bom:read": ("bom", "BOM 조회"),
+    "bom:write": ("bom", "BOM 작성"),
+    "bom:approve": ("bom", "BOM 승인"),
+    "production:read": ("production", "생산 조회"),
+    "production:write": ("production", "생산계획/지시 작성"),
+    "production:approve": ("production", "제조지시 승인"),
+    "production:execute": ("production", "제조지시 진행(시작/보류/완료)"),
+    "production:close": ("production", "제조지시 마감"),
+    "weighing:execute": ("weighing", "계량 실행"),
+    "weighing:reverse_approve": ("weighing", "계량 정정 승인"),
+    "process:read": ("process", "공정 조회"),
+    "process:write": ("process", "공정 마스터 관리"),
+    "process:execute": ("process", "공정 실행 기록"),
+    "process:approve": ("process", "공정 승인/병합 승인"),
+    "fg:read": ("fg", "완제품 조회"),
+    "fg:write": ("fg", "완제품 등록/라벨"),
+    "fg:inspect": ("fg", "완제품 검사"),
+    "fg:release": ("fg", "완제품 출고 승인(가용 전환)"),
+    "shipment:read": ("shipment", "출고 조회"),
+    "shipment:write": ("shipment", "출고 등록"),
+    "shipment:confirm": ("shipment", "출고 확정"),
+    "shipment:return": ("shipment", "반품 처리"),
+    "trace:read": ("trace", "추적 조회"),
+    "recall:read": ("recall", "회수 조회"),
+    "recall:manage": ("recall", "회수 관리/보류"),
+    "report:read": ("report", "보고서 조회"),
+    "report:export": ("report", "보고서 출력"),
+}
+
+_READ = [p for p in PERMISSIONS if p.endswith(":read")]
+
+ROLE_PERMISSIONS: dict[str, list[str]] = {
+    "SUPER_ADMIN": list(PERMISSIONS),
+    "ADMIN": _READ + [
+        "user:manage", "approval:decide", "master:write", "customer:write", "inventory:adjust_request",
+        "inventory:adjust_approve", "inventory:count", "inventory:reserve", "bom:write", "bom:approve",
+        "production:write", "production:approve", "production:close", "process:write",
+        "qr:print", "qr:reprint", "report:export",
+    ],
+    "QUALITY_MANAGER": _READ + [
+        "receipt:inspect", "receipt:approve", "receipt:reverse", "ocr:use", "quality:hold", "fg:inspect", "fg:release",
+        "recall:manage", "inventory:dispose", "inventory:adjust_request", "process:approve",
+        "weighing:reverse_approve", "approval:decide", "bom:approve", "qr:print", "qr:reprint", "report:export",
+    ],
+    "WAREHOUSE_MANAGER": [
+        "master:read", "receipt:read", "receipt:write", "receipt:post", "ocr:use", "qr:read", "qr:print", "qr:reprint",
+        "inventory:read", "inventory:move", "inventory:count", "inventory:adjust_request", "inventory:dispose",
+        "trace:read", "shipment:read", "fg:read", "production:read", "report:read", "report:export",
+    ],
+    "PRODUCTION_MANAGER": [
+        "master:read", "receipt:read", "inventory:read", "inventory:reserve", "inventory:move", "bom:read", "bom:write",
+        "production:read", "production:write", "production:approve", "production:execute", "production:close",
+        "process:read", "process:write", "process:execute", "process:approve", "weighing:execute",
+        "weighing:reverse_approve", "approval:decide", "fg:read", "fg:write", "qr:read", "qr:print", "qr:reprint",
+        "trace:read", "report:read", "report:export",
+    ],
+    "WORKER": [
+        "master:read", "qr:read", "qr:print", "inventory:read", "production:read", "bom:read", "weighing:execute",
+        "process:read", "process:execute", "fg:read", "receipt:read",
+    ],
+    "SHIPPING_MANAGER": [
+        "master:read", "customer:write", "fg:read", "inventory:read", "qr:read", "shipment:read", "shipment:write",
+        "shipment:confirm", "shipment:return", "trace:read", "report:read", "report:export",
+    ],
+    "VIEWER": _READ + ["report:export"],
+}
+
+ROLE_NAMES = {
+    "SUPER_ADMIN": "최고관리자",
+    "ADMIN": "관리자",
+    "QUALITY_MANAGER": "품질관리자",
+    "WAREHOUSE_MANAGER": "창고관리자",
+    "PRODUCTION_MANAGER": "생산관리자",
+    "WORKER": "작업자",
+    "SHIPPING_MANAGER": "출고관리자",
+    "VIEWER": "조회자",
+}

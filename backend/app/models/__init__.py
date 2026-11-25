@@ -1,0 +1,10 @@
+from app.models.base import Base  # noqa: F401
+from app.models.org import *  # noqa: F401,F403
+from app.models.master import *  # noqa: F401,F403
+from app.models.receipt import *  # noqa: F401,F403
+from app.models.inventory import *  # noqa: F401,F403
+from app.models.bom import *  # noqa: F401,F403
+from app.models.production import *  # noqa: F401,F403
+from app.models.fg import *  # noqa: F401,F403
+from app.models.trace import *  # noqa: F401,F403
+from app.models.common import *  # noqa: F401,F403

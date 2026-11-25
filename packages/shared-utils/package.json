@@ -1,0 +1,9 @@
+{
+  "name": "@mes/shared-utils",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Food ERP·MES shared-utils (pure TypeScript, no runtime dependencies)",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "sideEffects": false
+}
